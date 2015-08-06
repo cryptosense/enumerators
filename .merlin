@@ -1,0 +1,9 @@
+S .
+S 32
+S 64
+
+B _build
+B _build/32
+B _build/64
+
+PKG oUnit
