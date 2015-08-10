@@ -1,6 +1,11 @@
 open OUnit2
 open Enumerator
 
+let pp_int = string_of_int
+
+let pp_list pp_elem l =
+  "[" ^ String.concat ", " (List.map pp_elem l) ^ "]"
+
 let (===) a b =
   fun _ ->
     assert_equal a b
@@ -223,6 +228,29 @@ let test_firstn _ =
   done
 
 
+let test_choose_k_from_list =
+  "choose_k_from_list" >:::
+  [
+    begin
+      "empty" >:: (elements (make []) === elements (choose_k_from_list ~k:1 []))
+    end;
+    begin
+      let enums = [make []; make []] in
+      "list_of_empty" >:: ([] === elements (squash (choose_k_from_list ~k:1 enums)))
+    end;
+    begin
+      let enums = [make [1; 2; 3]; make [4; 5]] in
+      let combinations = elements (squash (choose_k_from_list ~k:2 enums)) in
+      "two_lists" >:: fun _ ->
+        assert_equal ~printer:(pp_list (pp_list pp_int))
+          [[1; 4]; [2; 4]; [3; 4]; [1; 5]; [2; 5]; [3; 5]]
+          combinations
+    end
+  ]
+
+
+
+
 let suite = "enumerator" >::: [
     test_elements_make;
     test_constant;
@@ -237,6 +265,7 @@ let suite = "enumerator" >::: [
     test_squash;
     test_round_robin;
     "test_firstn" >:: test_firstn;
+    test_choose_k_from_list;
   ]
 
 let () = run_test_tt_main suite

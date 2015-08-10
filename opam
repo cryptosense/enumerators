@@ -10,6 +10,7 @@ install: [make "install"]
 build-test: [make "check"]
 remove: ["ocamlfind" "remove" "enumerators"]
 depends: [
+  "bisect_ppx" {test}
   "ocamlfind" {build}
   "ounit" {test}
 ]
