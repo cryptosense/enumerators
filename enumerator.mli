@@ -133,7 +133,8 @@ type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
 
 val of_set : ('t, 'elt) set -> 't -> 'elt t
 
-(** Enumerate over a random permutation of an existing enumerator. *)
+(** Enumerate over a random permutation of an existing enumerator.  Warning: This can take
+    a lot of time on large enumerators. *)
 val shuffle : 'a t -> 'a t
 
 (** [maybe f e] builds the enumerator of [x; f x] for [x] in [e].  *)
