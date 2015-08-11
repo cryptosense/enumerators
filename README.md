@@ -37,6 +37,18 @@ let () =
   Enumerator.iter print_target targets
 ```
 
+You should get the following output:
+
+```
+[2001:db8::1]:1
+[2001:db8::2]:1
+[2001:db8::1]:2
+[2001:db8::2]:2
+[2001:db8::1]:3
+[2001:db8::2]:3
+...
+```
+
 Licensing
 ---------
 
