@@ -3,7 +3,7 @@ SOURCES=32/beint.ml 32/beint.mli 64/beint.ml 64/beint.mli enumerator.ml enumerat
 TARGET_NAMES=enumerator.cmi $(PACKAGE).cma $(PACKAGE).cmxa $(PACKAGE).a
 TARGETS=$(addprefix _build/, $(TARGET_NAMES))
 
-.PHONY: all
+.PHONY: all check check_coverage check_coverage_html install uninstall clean
 
 all: $(TARGETS)
 
