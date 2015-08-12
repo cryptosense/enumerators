@@ -8,7 +8,7 @@ Example
 
 Let's assume you want to scan ports of a few hosts on your network.  Your first task is to
 enumerate those ports.  Naturally, as the list can grow big, you don't want to have them
-all in memory at the same time.  This is were this libary comes into play.
+all in memory at the same time.  This is were this library comes into play.
 
 In this example, targets have the type `string * int` where the first element is the IP
 address and the second element is the network port.  Here is a function to print such a
