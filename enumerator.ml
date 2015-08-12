@@ -306,22 +306,6 @@ let partition (f : 'a -> bool) (e : 'a t) : 'a t * 'a t =
 
 (** {2 Constructors} *)
 
-let bool = make [false; true]
-
-let option (e : 'a t) : 'a option t =
-  let e_nth = e.nth in
-  let nth i =
-    if Beint.equal Beint.zero i
-    then None
-    else Some (e_nth (Beint.pred i))
-  in
-  {
-    size = Beint.succ e.size;
-    nth;
-    shape = "option";
-    depth = succ e.depth
-  }
-
 let product a b =
   if Beint.equal Beint.zero a.size || Beint.equal Beint.zero b.size
   then empty

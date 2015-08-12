@@ -47,12 +47,6 @@ val constant : 'a -> 'a t
     enumerated. *)
 val constant_delayed : (unit -> 'a) -> 'a t
 
-(** Enumerate [false], then [true]. *)
-val bool : bool t
-
-(** Enumerate [None], then continue with the given enumerator. *)
-val option : 'a t -> 'a option t
-
 (** [range a b] produces an enumerator for the integers between [a]
     and [b] included. If [b < a] the range is empty. *)
 val range : int -> int -> int t
