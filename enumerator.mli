@@ -4,23 +4,26 @@
 
 type 'a t
 
+(** Raised when an index is out of the bounds of an enumerator. *)
+exception Out_of_bounds
+
 (** Retrieve the element at a given index. *)
 val nth : 'a t -> int64 -> 'a
 
-(** Get all the elements of an enumeration. Order is preserved. *)
+(** Get all the elements of an enumeration in order. *)
 val elements : 'a t -> 'a list
 
 (** Get the number of elements of an enumeration. *)
-val cardinal : 'a t -> int64
+val size : 'a t -> int64
 
-(** Same as [Beint.to_int cardinal e]. May overflow. *)
-val size : 'a t -> int
+(** Same as [Int64.to_int (size e)]. May overflow. *)
+val size_int : 'a t -> int
 
 (** Test whether an enumeration is empty. *)
 val is_empty : 'a t -> bool
 
 (** [fold_left f acc a] computes [f (... (f (f acc a.(0)) a.(1)) ...)
-    a.(n-1)], where n is the cardinal of the enumerator [a]. *)
+    a.(n-1)], where n is the size of the enumerator [a]. *)
 val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
 
 (** Apply a function to the elements of an enumerator. *)

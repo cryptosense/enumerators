@@ -6,6 +6,23 @@ type 'a t =
     depth : int (* number of composed functions to create values, useful for debugging *)
   }
 
+exception Out_of_bounds
+
+let nth s i =
+  let i = Beint.of_int64 i in
+  if Beint.lt i s.size && Beint.(le zero i)
+  then s.nth i
+  else raise Out_of_bounds
+
+let is_empty s =
+  Beint.equal Beint.zero s.size
+
+let size s =
+  Beint.to_int64 s.size
+
+let size_int s =
+  Beint.to_int s.size
+
 let fold_left (f : 'a -> 'b -> 'a) (acc : 'a) (e : 'b t) : 'a =
   let rec aux i acc =
     if Beint.equal i e.size
@@ -36,17 +53,6 @@ let is_int =
   let n = Beint.of_int max_int in
   let m = Beint.of_int min_int in
   fun (i : Beint.t) -> Beint.le i n && Beint.le m i
-
-exception Out_of_bounds
-
-let is_empty s =
-  Beint.equal Beint.zero s.size
-
-let cardinal s =
-  Beint.to_int64 s.size
-
-let size s =
-  Beint.to_int s.size
 
 let of_array (v : 'a array) : 'a t =
   let size = Beint.of_int (Array.length v) in
@@ -567,12 +573,6 @@ type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
 let of_set (type t) (type elt) ((module Set) : (t, elt) set) (t : t) =
   let elements = Set.elements t in
   make elements
-
-let nth s i =
-  let i = Beint.of_int64 i in
-  if Beint.lt i s.size && Beint.(le zero i)
-  then s.nth i
-  else raise Out_of_bounds
 
 let elements s =
   let r = ref [] in
