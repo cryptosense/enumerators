@@ -7,39 +7,32 @@ let pp_list pp_elem l =
   "[" ^ String.concat ", " (List.map pp_elem l) ^ "]"
 
 let (===) a b =
-  fun _ ->
-    assert_equal a b
+  fun _ -> assert_equal a b
 
 let test_elements_make =
   let a = [1; 2; 3] in
-  "elements/make" >:::
   [
     "empty" >:: ([] === elements (make []));
-    "1; 2; 3" >:: (a === elements (make a));
+    "simple" >:: (a === elements (make a));
   ]
 
 let test_constant =
-  "elements/constant" >:::
   [
-    "1" >:: ([1] === elements (constant 1));
+    "one" >:: ([1] === elements (constant 1));
   ]
 
 let test_empty =
-  "elements/constant" >:::
   [
     "empty" >:: ([] === elements (empty));
   ]
 
-
 let test_map =
-  "map" >:::
   [
     "empty" >:: ([] === elements (map succ (make [])));
-    "1; 2; 3" >:: ([2; 3; 4] === elements (map succ (make [1; 2; 3])));
+    "simple" >:: ([2; 3; 4] === elements (map succ (make [1; 2; 3])));
   ]
 
 let test_range =
-  "range" >:::
   [
     "empty" >::
     ([] === elements (range 10 0));
@@ -47,9 +40,7 @@ let test_range =
     ([12; 13; 14; 15] === elements (range 12 15));
   ]
 
-
 let test_filter =
-  "filter" >:::
   [
     "empty" >::
     ([] === elements (filter (fun x -> x mod 2 = 0) empty));
@@ -60,7 +51,6 @@ let test_filter =
   ]
 
 let test_append =
-  "append" >:::
   [
     "empty" >::
     ([] === elements (append empty empty));
@@ -76,7 +66,6 @@ let test_product =
   let (===) a b = fun _ ->
     assert_equal a b
   in
-  "product" >:::
   [
     "empty" >::
     ([] === elements (product empty empty));
@@ -95,7 +84,6 @@ let test_bitset =
   let (===) a b = fun _ ->
     assert_equal a b
   in
-  "subset" >:::
   [
     "size 2">::
     ([0b00; 0b01; 0b10; 0b11] === (elements (bitset 2)));
@@ -119,7 +107,6 @@ let test_subset =
     in
     assert_equal a b
   in
-  "subset" >:::
   [
     "empty" >::
     ([[]] === (subset [empty]));
@@ -150,7 +137,6 @@ let test_subset =
   ]
 
 let test_squash =
-  "squash" >:::
   [
     begin
       "empty" >::
@@ -182,7 +168,6 @@ let test_squash =
 
 
 let test_round_robin =
-  "round_robin" >:::
   [
     begin
       "empty" >::
@@ -211,8 +196,6 @@ let test_round_robin =
     end;
   ]
 
-
-
 let test_firstn _ =
   for a = 0 to 4 do
     for b = 0 to 8 do
@@ -227,9 +210,7 @@ let test_firstn _ =
     done
   done
 
-
 let test_choose_k_from_list =
-  "choose_k_from_list" >:::
   [
     begin
       "empty" >:: (elements (make []) === elements (choose_k_from_list ~k:1 []))
@@ -248,24 +229,21 @@ let test_choose_k_from_list =
     end
   ]
 
-
-
-
 let suite = "enumerator" >::: [
-    test_elements_make;
-    test_constant;
-    test_empty;
-    test_map;
-    test_range;
-    test_filter;
-    test_product;
-    test_append;
-    test_bitset;
-    test_subset;
-    test_squash;
-    test_round_robin;
-    "test_firstn" >:: test_firstn;
-    test_choose_k_from_list;
+    "elements_make" >::: test_elements_make;
+    "constant" >::: test_constant;
+    "empty" >::: test_empty;
+    "map" >::: test_map;
+    "range" >::: test_range;
+    "filter" >::: test_filter;
+    "product" >::: test_product;
+    "append" >::: test_append;
+    "bitset" >::: test_bitset;
+    "subset" >::: test_subset;
+    "squash" >::: test_squash;
+    "round_robin" >::: test_round_robin;
+    "firstn" >:: test_firstn;
+    "choose_k_from_list" >::: test_choose_k_from_list;
   ]
 
 let () = run_test_tt_main suite
