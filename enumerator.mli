@@ -40,6 +40,11 @@ val make : 'a list -> 'a t
 (** Same as [make]. *)
 val of_list : 'a list -> 'a t
 
+type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
+
+(** Build an enumerator from a set. *)
+val of_set : ('t, 'elt) set -> 't -> 'elt t
+
 (** Empty enumerator. *)
 val empty : 'a t
 
@@ -54,24 +59,45 @@ val constant_delayed : (unit -> 'a) -> 'a t
     and [b] included. If [b < a] the range is empty. *)
 val range : int -> int -> int t
 
-(** Enumerate pairs. *)
-val product : 'a t -> 'b t -> ('a * 'b) t
+(** Enumerates a bitset of size [n] represented as integers. [n] must
+    be less than [Sys.word_size - 2] (e.g., 30 or 62, depending on your architecture). The
+    bitset is enumerated by levels, that is, all subsets of size [k] are enumerated, then
+    all subsets of size [k+1] and so on. *)
+val bitset : ?k:int -> int -> int t
 
-val scalar_left : 'a -> 'b t -> ('a * 'b) t
-val scalar_right : 'a t -> 'b -> ('a * 'b) t
+(** {2 Combinators} *)
 
 (** Map a function over an enumerator. *)
 val map : ('a -> 'b) -> 'a t -> 'b t
 
-(** Squash enumerators.  *)
+(** [append a b] enumerates all the elements of [a] then all the
+    elements of [b]. *)
+val append : 'a t -> 'a t -> 'a t
+
+(** Squash enumerators in order.  *)
 val squash : 'a t t -> 'a t
 
 (** Alternative implementation of [Enumerator.squash] using [Enumerator.append], faster
     here. *)
 val squash_append : 'a t t -> 'a t
 
-(** Squash enumerators in a round-robin fashion.  *)
+(** Squash enumerators in round-robin order.  *)
 val round_robin : 'a t t -> 'a t
+
+(** [firstn n e] enumerates the first [n] elements from the enumerator [e].  If the
+    enumerator has less than [n] elements, it will only enumerate those. *)
+val firstn : int64 -> 'a t -> 'a list * 'a t
+
+(** Enumerate pairs. *)
+val product : 'a t -> 'b t -> ('a * 'b) t
+
+(** [scalar_left a e] enumerates [(a, e0), (a, e1), ...] where [e0, e1, ...] are the
+    elements of the enumerator [e]. *)
+val scalar_left : 'a -> 'b t -> ('a * 'b) t
+
+(** [scalar_right e b] enumerates [(e0, b), (e1, b), ...] where [e0, e1, ...] are the
+    elements of the enumerator [e]. *)
+val scalar_right : 'a t -> 'b -> ('a * 'b) t
 
 (** Apply a filter on an enumerator.  Warning:  this combinator evaluates its
     elements. *)
@@ -81,26 +107,11 @@ val filter : ('a -> bool) -> 'a t -> 'a t
     append the remaining one after that. *)
 val interleave : 'a t -> 'a t -> 'a t
 
-(** [append a b] enumerates all the elements of [a] then all the
-    elements of [b]. *)
-val append : 'a t -> 'a t -> 'a t
-
 (** [partition p e] returns a pair of enumerators [(e1, e2)], where [e1] is the enumerator
     of all the elements of [e] that satisfy the predicate [p], and [e2] is the enumerator
     of all the elements of [e] that do not satisfy [p].  The order of the elements from
     the input enumerator is preserved.  Warning: this combinator evaluates its elements. *)
 val partition : ('a -> bool) -> 'a t -> 'a t * 'a t
-
-(** [firstn n e] extracts [n] elements from the enumerator [e].  If the enumerator has
-    less than [n] elements, it will only extract those. *)
-val firstn : int64 -> 'a t -> 'a list * 'a t
-
-(** Enumerates a bitset of size [n] represented as integers. [n] must
-    be less than [Sys.word_size - 2] (e.g., 30 or 62, depending on
-    your architecture). The bitset is enumerated by levels, that is,
-    all subsets of size k are enumerated, then all subsets of size k+1
-    and so on. *)
-val bitset : ?k:int -> int -> int t
 
 (** Make a balanced subset enumerator.
 
@@ -126,10 +137,6 @@ val subset : ?k:int -> 'a t list -> 'a list t t
 (** Generate all sets of k elements by picking at most one element per input list. *)
 val choose_k_from_list : k:int -> 'a t list -> 'a list t t
 
-type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
-
-val of_set : ('t, 'elt) set -> 't -> 'elt t
-
 (** Enumerate over a random permutation of an existing enumerator.  Warning: This can take
     a lot of time on large enumerators. *)
 val shuffle : 'a t -> 'a t
@@ -146,7 +153,9 @@ val maybe_cons : 'a -> 'a list t -> 'a list t
     s2].  *)
 val maybe_some_of : k:int -> 'a list -> 'a list t -> 'a list t
 
-
 (** {2 Debug}  *)
 
+(** Return the depth of an enumerator, that is, the number of combinators that this
+    enumerator is based on.  It is reset when a combinator that evaluates the elements of
+    an enumerator is applied. *)
 val depth : 'a t -> int
