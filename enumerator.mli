@@ -26,6 +26,9 @@ val is_empty : 'a t -> bool
     a.(n-1)], where n is the size of the enumerator [a]. *)
 val fold_left : ('a -> 'b -> 'a) -> 'a -> 'b t -> 'a
 
+(** Map a function over an enumerator. *)
+val map : ('a -> 'b) -> 'a t -> 'b t
+
 (** Apply a function to the elements of an enumerator. *)
 val iter : ('a -> unit) -> 'a t -> unit
 
@@ -66,9 +69,6 @@ val range : int -> int -> int t
 val bitset : ?k:int -> int -> int t
 
 (** {2 Combinators} *)
-
-(** Map a function over an enumerator. *)
-val map : ('a -> 'b) -> 'a t -> 'b t
 
 (** [append a b] enumerates all the elements of [a] then all the
     elements of [b]. *)

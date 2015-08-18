@@ -31,6 +31,16 @@ let fold_left (f : 'a -> 'b -> 'a) (acc : 'a) (e : 'b t) : 'a =
   in
   aux Beint.zero acc
 
+let map f e =
+  let e_nth = e.nth in
+  let nth i = f (e_nth i) in
+  {
+    size = e.size;
+    nth;
+    shape = "map";
+    depth = e.depth + 1;
+  }
+
 let iteri (f : int64 -> 'a -> unit) (e : 'a t) : unit =
   let  rec aux i =
     if not (Beint.equal i e.size)
@@ -104,16 +114,6 @@ let memoize e =
 (******************************************************************************)
 (*                         Operations on Enumerations                         *)
 (******************************************************************************)
-
-let map (f : 'a -> 'b) (e : 'a t) : 'b t =
-  let e_nth = e.nth in
-  let nth i = f (e_nth i) in
-  {
-    size= e.size;
-    nth;
-    shape = "map";
-    depth = 1 + e.depth;
-  }
 
 let filter (f : 'a -> bool) (e : 'a t) : 'a t =
   let rec indices acc i =

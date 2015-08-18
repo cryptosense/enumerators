@@ -51,6 +51,12 @@ let test_fold_left =
     ("one_two", [2; 1], one_two)
   ]
 
+let test_map =
+  [
+    "empty" >:: ([] === elements (map succ empty));
+    "one_two" >:: ([2; 3] === elements (map succ one_two));
+  ]
+
 let test_iter =
   let add_to acc elt =
     acc := elt :: !acc in
@@ -77,11 +83,6 @@ let test_memoize =
 
 let test_constant = [
   "one" >:: ([1] === elements (constant 1));
-]
-
-let test_map = [
-  "empty" >:: ([] === elements (map succ (make [])));
-  "simple" >:: ([2; 3; 4] === elements (map succ (make [1; 2; 3])));
 ]
 
 let test_range = [
@@ -279,10 +280,10 @@ let suite = "enumerator" >::: [
     "size" >::: test_size;
     "is_empty" >::: test_is_empty;
     "fold_left" >::: test_fold_left;
+    "map" >::: test_map;
     "iter" >::: test_iter;
     "memoize" >::: test_memoize;
     "constant" >::: test_constant;
-    "map" >::: test_map;
     "range" >::: test_range;
     "filter" >::: test_filter;
     "product" >::: test_product;
