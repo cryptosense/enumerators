@@ -117,6 +117,20 @@ let test_append =
     ("one_two_three", [1; 2; 3], (one_two, make [3]));
   ]
 
+let test_interleave =
+  let test output (input_1, input_2) =
+    let interleaved = interleave input_1 input_2 in
+    assert_equal ~printer:(pp_list pp_int) output (elements interleaved) in
+
+  map_test test [
+    ("empty_empty", [], (empty, empty));
+    ("empty_one_two", [1; 2], (empty, one_two));
+    ("one_two_empty", [1; 2], (one_two, empty));
+    ("one_two_three", [1; 3; 2], (one_two, make [3]));
+    ("three_one_two", [3; 1; 2], (make [3], one_two));
+    ("one_two_three_four", [1; 3; 2; 4], (make [1; 2], make [3; 4]));
+  ]
+
 let test_product =
   let (===) a b = fun _ ->
     assert_equal a b
@@ -294,6 +308,7 @@ let suite = "enumerator" >::: [
     "filter" >::: test_filter;
     "product" >::: test_product;
     "append" >::: test_append;
+    "interleave" >::: test_interleave;
     "bitset" >::: test_bitset;
     "subset" >::: test_subset;
     "squash" >::: test_squash;

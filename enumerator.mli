@@ -74,6 +74,10 @@ val bitset : ?k:int -> int -> int t
     elements of [b]. *)
 val append : 'a t -> 'a t -> 'a t
 
+(** Interleave two enumerators until one of them becomes empty and then
+    append the remaining one after that. *)
+val interleave : 'a t -> 'a t -> 'a t
+
 (** Squash enumerators in order.  *)
 val squash : 'a t t -> 'a t
 
@@ -102,10 +106,6 @@ val scalar_right : 'a t -> 'b -> ('a * 'b) t
 (** Apply a filter on an enumerator.  Warning:  this combinator evaluates its
     elements. *)
 val filter : ('a -> bool) -> 'a t -> 'a t
-
-(** Interleave two enumerators until one of them becomes empty and then
-    append the remaining one after that. *)
-val interleave : 'a t -> 'a t -> 'a t
 
 (** [partition p e] returns a pair of enumerators [(e1, e2)], where [e1] is the enumerator
     of all the elements of [e] that satisfy the predicate [p], and [e2] is the enumerator
