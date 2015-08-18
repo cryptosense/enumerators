@@ -105,16 +105,17 @@ let test_filter = [
   ([0; 2] === elements (filter (fun x -> x mod 2 = 0) (range 0 2)));
 ]
 
-let test_append = [
-  "empty" >::
-  ([] === elements (append empty empty));
-  "nonempty" >::
-  ([0; 1] === elements (append (range 0 1) empty));
-  "nonempty" >::
-  ([0; 1] === elements (append empty (range 0 1)));
-  "nonempty" >::
-  ([0; 1; 2; 3] === elements (append (range 0 1) (range 2 3)));
-]
+let test_append =
+  let test output (input_1, input_2) =
+    let appended = append input_1 input_2 in
+    assert_equal ~printer:(pp_list pp_int) output (elements appended) in
+
+  map_test test [
+    ("empty_empty", [], (empty, empty));
+    ("empty_one_two", [1; 2], (empty, one_two));
+    ("one_two_empty", [1; 2], (one_two, empty));
+    ("one_two_three", [1; 2; 3], (one_two, make [3]));
+  ]
 
 let test_product =
   let (===) a b = fun _ ->

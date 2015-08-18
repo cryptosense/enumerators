@@ -129,30 +129,26 @@ let filter (f : 'a -> bool) (e : 'a t) : 'a t =
   let enum = of_array indices in
   {enum with shape = "filter"}
 
-let append (e1 : 'a t) (e2 : 'a t) : 'a t =
-  if Beint.equal Beint.zero e1.size
-  then e2
-  else if Beint.equal Beint.zero e2.size
-  then e1
+let append e1 e2 =
+  if is_empty e1 then
+    e2 (* optimization *)
+  else if is_empty e2 then
+    e1 (* optimization *)
   else
     let e1_size = e1.size in
     let e1_nth = e1.nth in
     let e2_size = e2.size in
     let e2_nth = e2.nth in
     let nth i =
-      if Beint.lt i e1_size
-      then e1_nth i
+      if Beint.lt i e1_size then
+        e1_nth i
       else
-        let i = Beint.sub i e1_size in
-        if Beint.lt i e2_size
-        then e2_nth i
-        else raise Out_of_bounds
-    in
+        e2_nth (Beint.sub i e1_size) in
     {
-      size = Beint.add e1.size e2.size;
+      size = Beint.add e1_size e2_size;
       nth;
       shape = "append";
-      depth = 1 + max_i e1.depth e2.depth
+      depth = max_i e1.depth e2.depth + 1
     }
 
 let sub s start len =
