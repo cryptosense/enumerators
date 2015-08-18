@@ -379,11 +379,12 @@ let print_binary ?(length=Sys.word_size) n =
 (** [binomial n k] computes the binomial coefficient, that is the number of
     ways to pick [k] elements among [n]. *)
 let rec binomial n k =
-  if k > n then 0
-  else if k = 0
-  then 1
-  else if k = n
-  then 1
+  if k > n then
+    0
+  else if k = 0 then
+    1
+  else if k = n then
+    1
   else
     binomial (n - 1) (k - 1) + binomial (n - 1) k
 
@@ -398,7 +399,6 @@ let bitset ?k n : int t =
       done;
       !r
   in
-  (* let size = 1 lsl n in *)
   let v = Array.make size 0 in
   let r = ref 1 in
   let n = 1 lsl n in
@@ -407,7 +407,6 @@ let bitset ?k n : int t =
     r := Bitset.step !r n
   done;
   of_array v
-
 
 (******************************************************************************)
 (*                                 round robin                                *)

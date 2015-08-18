@@ -150,19 +150,20 @@ let test_product =
   ]
 
 let test_bitset =
-  let (===) a b = fun _ ->
-    assert_equal a b in
-  [
-    "size 2">::
-    ([0b00; 0b01; 0b10; 0b11] === (elements (bitset 2)));
+  let test output input =
+    let (n, k) = input in
+    let set = bitset ?k n in
+    assert_equal ~printer:(pp_list pp_int) output (elements set) in
 
-    "size 3">::
-    ([0b000; 0b001; 0b010; 0b100; 0b011; 0b101; 0b110; 0b111 ] === (elements (bitset 3)));
-
-    "cardinal">::
-    (fun _ -> assert_equal
-        (List.length (elements (bitset 4)))
-        (1 lsl 4))
+  map_test test [
+    ("n_zero", [0b0], (0, None));
+    ("n_one", [0b0; 0b1], (1, None));
+    ("n_two", [0b00; 0b01; 0b10; 0b11], (2, None));
+    ("n_three", [0b000; 0b001; 0b010; 0b100; 0b011; 0b101; 0b110; 0b111], (3, None));
+    ("n_two_k_zero", [0b0], (2, Some 0));
+    ("n_two_k_one", [0b00; 0b01; 0b10], (2, Some 1));
+    ("n_two_k_two", [0b00; 0b01; 0b10; 0b11], (2, Some 2));
+    ("n_three_k_two", [0b000; 0b001; 0b010; 0b100; 0b011; 0b101; 0b110], (3, Some 2));
   ]
 
 let test_subset =
@@ -289,11 +290,11 @@ let suite = "enumerator" >::: [
     "constant" >::: test_constant;
     "constant_delayed" >::: test_constant_delayed;
     "range" >::: test_range;
+    "bitset" >::: test_bitset;
     "filter" >::: test_filter;
     "append" >::: test_append;
     "interleave" >::: test_interleave;
     "product" >::: test_product;
-    "bitset" >::: test_bitset;
     "subset" >::: test_subset;
     "squash" >::: test_squash;
     "round_robin" >::: test_round_robin;

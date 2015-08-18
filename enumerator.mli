@@ -62,10 +62,14 @@ val constant_delayed : (unit -> 'a) -> 'a t
     and [b] included. If [b < a] the range is empty. *)
 val range : int -> int -> int t
 
-(** Enumerates a bitset of size [n] represented as integers. [n] must
-    be less than [Sys.word_size - 2] (e.g., 30 or 62, depending on your architecture). The
-    bitset is enumerated by levels, that is, all subsets of size [k] are enumerated, then
-    all subsets of size [k+1] and so on. *)
+(** [bitset n] enumerates a bitset of size [n] represented as integers.  [bitset ~k n]
+    enumerates the elements having at most [k] ones in their binary representation.
+
+    Elements with fewer ones come first in the enumeration.  For example: [bitset ~k:2 3]
+    returns [\[0b000; 0b001; 0b010; 0b100; 0b011; 0b101; 0b110\]].
+
+    [n] must be less than [Sys.word_size - 2] (e.g., 30 or 62, depending on your
+    architecture). *)
 val bitset : ?k:int -> int -> int t
 
 (** {2 Combinators} *)
