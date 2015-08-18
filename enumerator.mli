@@ -78,12 +78,8 @@ val append : 'a t -> 'a t -> 'a t
     append the remaining one after that. *)
 val interleave : 'a t -> 'a t -> 'a t
 
-(** Squash enumerators in order.  *)
+(** Concatenate an enumerator of enumerators.  *)
 val squash : 'a t t -> 'a t
-
-(** Alternative implementation of [Enumerator.squash] using [Enumerator.append], faster
-    here. *)
-val squash_append : 'a t t -> 'a t
 
 (** Squash enumerators in round-robin order.  *)
 val round_robin : 'a t t -> 'a t

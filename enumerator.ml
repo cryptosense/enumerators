@@ -262,8 +262,6 @@ let squash e =
     shape = "squash";
   }
 
-let squash_append es = fold_left append empty es
-
 let cartesian_product (e : 'a t) (f : 'b t) (k : 'a -> 'b -> 'c) : 'c t =
   let e_size = e.size in
   let size = Beint.mul e_size f.size in

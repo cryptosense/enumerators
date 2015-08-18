@@ -203,35 +203,19 @@ let test_subset =
 
   ]
 
-let test_squash = [
-  begin
-    "empty" >::
-    ([] === elements (squash (constant empty)))
-  end;
+let test_squash =
+  let test output input =
+    let squashed = squash input in
+    assert_equal ~printer:(pp_list pp_int) output (elements squashed)
+  in
 
-  begin
-    "singleton" >::
-    ([1] === elements (squash (constant (constant 1))))
-  end;
-
-  begin
-    "range" >::
-    ([1; 2] === elements (squash (constant (range 1 2))))
-  end;
-
-  begin
-    let c = constant in
-    let (--) = range in
-    let (@@) = append in
-    let enum =
-      (c (1--2))@@(c (3--4)@@(c (c 5)))
-    in
-    "range"
-    >::
-    ([1; 2; 3; 4; 5] === elements (squash enum))
-  end;
-]
-
+  map_test test [
+    ("empty", [], make []);
+    ("empty_one_two", [1; 2], make [empty; one_two]);
+    ("one_two_empty", [1; 2], make [one_two; empty]);
+    ("two_enumerators", [1; 2; 3; 4], make [one_two; make [3; 4]]);
+    ("three_enumerators", [1; 2; 3; 4], make [one_two; make [3]; make [4]]);
+  ]
 
 let test_round_robin = [
   begin
