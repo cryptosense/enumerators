@@ -62,6 +62,34 @@ val constant_delayed : (unit -> 'a) -> 'a t
     and [b] included. If [b < a] the range is empty. *)
 val range : int -> int -> int t
 
+(** {2 Transformations} *)
+
+(** [firstn n e] enumerates the first [n] elements from the enumerator [e].  If the
+    enumerator has less than [n] elements, it will only enumerate those. *)
+val firstn : int64 -> 'a t -> 'a list * 'a t
+
+(** Apply a filter on an enumerator.  Warning:  this combinator evaluates its
+    elements. *)
+val filter : ('a -> bool) -> 'a t -> 'a t
+
+(** [partition p e] returns a pair of enumerators [(e1, e2)], where [e1] is the enumerator
+    of all the elements of [e] that satisfy the predicate [p], and [e2] is the enumerator
+    of all the elements of [e] that do not satisfy [p].  The order of the elements from
+    the input enumerator is preserved.  Evaluates its elements. *)
+val partition : ('a -> bool) -> 'a t -> 'a t * 'a t
+
+(** Enumerate over a random permutation of an existing enumerator.  Warning: This can take
+    a lot of time on large enumerators. *)
+val shuffle : 'a t -> 'a t
+
+(** [scalar_left a e] enumerates [(a, e0), (a, e1), ...] where [e0, e1, ...] are the
+    elements of the enumerator [e]. *)
+val scalar_left : 'a -> 'b t -> ('a * 'b) t
+
+(** [scalar_right e b] enumerates [(e0, b), (e1, b), ...] where [e0, e1, ...] are the
+    elements of the enumerator [e]. *)
+val scalar_right : 'a t -> 'b -> ('a * 'b) t
+
 (** [bitset n] enumerates a bitset of size [n] represented as integers.  [bitset ~k n]
     enumerates the elements having at most [k] ones in their binary representation.
 
@@ -91,28 +119,6 @@ val squash : 'a t t -> 'a t
 (** Squash enumerators in round-robin order.  *)
 val round_robin : 'a t t -> 'a t
 
-(** [firstn n e] enumerates the first [n] elements from the enumerator [e].  If the
-    enumerator has less than [n] elements, it will only enumerate those. *)
-val firstn : int64 -> 'a t -> 'a list * 'a t
-
-(** [scalar_left a e] enumerates [(a, e0), (a, e1), ...] where [e0, e1, ...] are the
-    elements of the enumerator [e]. *)
-val scalar_left : 'a -> 'b t -> ('a * 'b) t
-
-(** [scalar_right e b] enumerates [(e0, b), (e1, b), ...] where [e0, e1, ...] are the
-    elements of the enumerator [e]. *)
-val scalar_right : 'a t -> 'b -> ('a * 'b) t
-
-(** Apply a filter on an enumerator.  Warning:  this combinator evaluates its
-    elements. *)
-val filter : ('a -> bool) -> 'a t -> 'a t
-
-(** [partition p e] returns a pair of enumerators [(e1, e2)], where [e1] is the enumerator
-    of all the elements of [e] that satisfy the predicate [p], and [e2] is the enumerator
-    of all the elements of [e] that do not satisfy [p].  The order of the elements from
-    the input enumerator is preserved.  Warning: this combinator evaluates its elements. *)
-val partition : ('a -> bool) -> 'a t -> 'a t * 'a t
-
 (** Make a balanced subset enumerator.
 
     The resulting enumerator has type ['a list t t] (that is, is an
@@ -136,10 +142,6 @@ val subset : ?k:int -> 'a t list -> 'a list t t
 
 (** Generate all sets of k elements by picking at most one element per input list. *)
 val choose_k_from_list : k:int -> 'a t list -> 'a list t t
-
-(** Enumerate over a random permutation of an existing enumerator.  Warning: This can take
-    a lot of time on large enumerators. *)
-val shuffle : 'a t -> 'a t
 
 (** [maybe f e] builds the enumerator of [x; f x] for [x] in [e].  *)
 val maybe : ('a -> 'a) -> 'a t -> 'a t
