@@ -4,63 +4,112 @@ open Enumerator
 let pp_int = string_of_int
 
 let pp_list pp_elem l =
-  "[" ^ String.concat ", " (List.map pp_elem l) ^ "]"
+  "[" ^ String.concat "; " (List.map pp_elem l) ^ "]"
 
 let (===) a b =
   fun _ -> assert_equal a b
 
-let test_elements_make =
-  let a = [1; 2; 3] in
-  [
-    "empty" >:: ([] === elements (make []));
-    "simple" >:: (a === elements (make a));
+let map_test test inputs =
+  let make do_test (name, output, input) =
+    name >:: (fun _ -> do_test output input) in
+  List.map (make test) inputs
+
+let one_two = make [1; 2]
+
+let test_elements_make = [
+  "empty" >:: ([] === elements (make []));
+  "one_two" >:: ([1; 2] === elements one_two);
+]
+
+let test_nth = [
+  "empty" >:: (fun _ ->
+      assert_raises Out_of_bounds (fun () -> nth empty 0L));
+  "one_two_first" >:: (1 === nth one_two 0L);
+  "one_two_second" >:: (2 === nth one_two 1L);
+]
+
+let test_size = [
+  "empty" >:: (0L === size empty);
+  "empty_int" >:: (0 === size_int empty);
+  "one_two" >:: (2L === size one_two);
+  "one_two_int" >:: (2 === size_int one_two);
+]
+
+let test_is_empty = [
+  "empty" >:: (true === is_empty empty);
+  "one_two" >:: (false === is_empty one_two);
+]
+
+let test_fold_left =
+  let cons = fun t h -> h :: t in
+
+  let test output input =
+    assert_equal ~printer:(pp_list pp_int) output (fold_left cons [] input) in
+
+  map_test test [
+    ("empty", [], empty);
+    ("one_two", [2; 1], one_two)
   ]
 
-let test_constant =
-  [
-    "one" >:: ([1] === elements (constant 1));
+let test_iter =
+  let add_to acc elt =
+    acc := elt :: !acc in
+
+  let test output input =
+    let acc = ref [] in
+    iter (add_to acc) input;
+    assert_equal ~printer:(pp_list pp_int) output !acc in
+
+  map_test test [
+    ("empty", [], empty);
+    ("one_two", [2; 1], one_two)
   ]
 
-let test_empty =
-  [
-    "empty" >:: ([] === elements (empty));
+let test_memoize =
+  let test output input =
+    let memoized = memoize input in
+    assert_equal ~printer:(pp_list pp_int) output (elements memoized) in
+
+  map_test test [
+    ("empty", [], empty);
+    ("one_two", [1; 2], one_two)
   ]
 
-let test_map =
-  [
-    "empty" >:: ([] === elements (map succ (make [])));
-    "simple" >:: ([2; 3; 4] === elements (map succ (make [1; 2; 3])));
-  ]
+let test_constant = [
+  "one" >:: ([1] === elements (constant 1));
+]
 
-let test_range =
-  [
-    "empty" >::
-    ([] === elements (range 10 0));
-    "non-empty" >::
-    ([12; 13; 14; 15] === elements (range 12 15));
-  ]
+let test_map = [
+  "empty" >:: ([] === elements (map succ (make [])));
+  "simple" >:: ([2; 3; 4] === elements (map succ (make [1; 2; 3])));
+]
 
-let test_filter =
-  [
-    "empty" >::
-    ([] === elements (filter (fun x -> x mod 2 = 0) empty));
-    "empty" >::
-    ([] === elements (filter (fun x -> x mod 2 = 0) (range 1 1)));
-    "non-empty" >::
-    ([0; 2] === elements (filter (fun x -> x mod 2 = 0) (range 0 2)));
-  ]
+let test_range = [
+  "empty" >::
+  ([] === elements (range 10 0));
+  "non-empty" >::
+  ([12; 13; 14; 15] === elements (range 12 15));
+]
 
-let test_append =
-  [
-    "empty" >::
-    ([] === elements (append empty empty));
-    "nonempty" >::
-    ([0; 1] === elements (append (range 0 1) empty));
-    "nonempty" >::
-    ([0; 1] === elements (append empty (range 0 1)));
-    "nonempty" >::
-    ([0; 1; 2; 3] === elements (append (range 0 1) (range 2 3)));
-  ]
+let test_filter = [
+  "empty" >::
+  ([] === elements (filter (fun x -> x mod 2 = 0) empty));
+  "empty" >::
+  ([] === elements (filter (fun x -> x mod 2 = 0) (range 1 1)));
+  "non-empty" >::
+  ([0; 2] === elements (filter (fun x -> x mod 2 = 0) (range 0 2)));
+]
+
+let test_append = [
+  "empty" >::
+  ([] === elements (append empty empty));
+  "nonempty" >::
+  ([0; 1] === elements (append (range 0 1) empty));
+  "nonempty" >::
+  ([0; 1] === elements (append empty (range 0 1)));
+  "nonempty" >::
+  ([0; 1; 2; 3] === elements (append (range 0 1) (range 2 3)));
+]
 
 let test_product =
   let (===) a b = fun _ ->
@@ -82,8 +131,7 @@ let test_product =
 
 let test_bitset =
   let (===) a b = fun _ ->
-    assert_equal a b
-  in
+    assert_equal a b in
   [
     "size 2">::
     ([0b00; 0b01; 0b10; 0b11] === (elements (bitset 2)));
@@ -105,8 +153,7 @@ let test_subset =
         (elements b)
         []
     in
-    assert_equal a b
-  in
+    assert_equal a b in
   [
     "empty" >::
     ([[]] === (subset [empty]));
@@ -136,65 +183,63 @@ let test_subset =
 
   ]
 
-let test_squash =
-  [
-    begin
-      "empty" >::
-      ([] === elements (squash (constant empty)))
-    end;
+let test_squash = [
+  begin
+    "empty" >::
+    ([] === elements (squash (constant empty)))
+  end;
 
-    begin
-      "singleton" >::
-      ([1] === elements (squash (constant (constant 1))))
-    end;
+  begin
+    "singleton" >::
+    ([1] === elements (squash (constant (constant 1))))
+  end;
 
-    begin
-      "range" >::
-      ([1; 2] === elements (squash (constant (range 1 2))))
-    end;
+  begin
+    "range" >::
+    ([1; 2] === elements (squash (constant (range 1 2))))
+  end;
 
-    begin
-      let c = constant in
-      let (--) = range in
-      let (@@) = append in
-      let enum =
-        (c (1--2))@@(c (3--4)@@(c (c 5)))
-      in
-      "range"
-      >::
-      ([1; 2; 3; 4; 5] === elements (squash enum))
-    end;
-  ]
+  begin
+    let c = constant in
+    let (--) = range in
+    let (@@) = append in
+    let enum =
+      (c (1--2))@@(c (3--4)@@(c (c 5)))
+    in
+    "range"
+    >::
+    ([1; 2; 3; 4; 5] === elements (squash enum))
+  end;
+]
 
 
-let test_round_robin =
-  [
-    begin
-      "empty" >::
-      ([] === elements (round_robin (constant empty)))
-    end;
+let test_round_robin = [
+  begin
+    "empty" >::
+    ([] === elements (round_robin (constant empty)))
+  end;
 
-    begin
-      "singleton" >::
-      ([1] === elements (round_robin (constant (constant 1))))
-    end;
+  begin
+    "singleton" >::
+    ([1] === elements (round_robin (constant (constant 1))))
+  end;
 
-    begin
-      "range" >::
-      ([1; 2] === elements (round_robin (constant (range 1 2))))
-    end;
+  begin
+    "range" >::
+    ([1; 2] === elements (round_robin (constant (range 1 2))))
+  end;
 
-    begin
-      let c = constant in
-      let (--) = range in
-      let (@@) = append in
-      let enum =
-        (c (1--2))@@(c (3--4)@@(c (c 5)))
-      in
-      "range" >::
-      ([1; 3; 5; 2; 4] === elements (round_robin enum))
-    end;
-  ]
+  begin
+    let c = constant in
+    let (--) = range in
+    let (@@) = append in
+    let enum =
+      (c (1--2))@@(c (3--4)@@(c (c 5)))
+    in
+    "range" >::
+    ([1; 3; 5; 2; 4] === elements (round_robin enum))
+  end;
+]
 
 let test_firstn _ =
   for a = 0 to 4 do
@@ -210,29 +255,33 @@ let test_firstn _ =
     done
   done
 
-let test_choose_k_from_list =
-  [
-    begin
-      "empty" >:: (elements (make []) === elements (choose_k_from_list ~k:1 []))
-    end;
-    begin
-      let enums = [make []; make []] in
-      "list_of_empty" >:: ([] === elements (squash (choose_k_from_list ~k:1 enums)))
-    end;
-    begin
-      let enums = [make [1; 2; 3]; make [4; 5]] in
-      let combinations = elements (squash (choose_k_from_list ~k:2 enums)) in
-      "two_lists" >:: fun _ ->
-        assert_equal ~printer:(pp_list (pp_list pp_int))
-          [[1; 4]; [2; 4]; [3; 4]; [1; 5]; [2; 5]; [3; 5]]
-          combinations
-    end
-  ]
+let test_choose_k_from_list = [
+  begin
+    "empty" >:: (elements (make []) === elements (choose_k_from_list ~k:1 []))
+  end;
+  begin
+    let enums = [make []; make []] in
+    "list_of_empty" >:: ([] === elements (squash (choose_k_from_list ~k:1 enums)))
+  end;
+  begin
+    let enums = [make [1; 2; 3]; make [4; 5]] in
+    let combinations = elements (squash (choose_k_from_list ~k:2 enums)) in
+    "two_lists" >:: fun _ ->
+      assert_equal ~printer:(pp_list (pp_list pp_int))
+        [[1; 4]; [2; 4]; [3; 4]; [1; 5]; [2; 5]; [3; 5]]
+        combinations
+  end
+]
 
 let suite = "enumerator" >::: [
     "elements_make" >::: test_elements_make;
+    "nth" >::: test_nth;
+    "size" >::: test_size;
+    "is_empty" >::: test_is_empty;
+    "fold_left" >::: test_fold_left;
+    "iter" >::: test_iter;
+    "memoize" >::: test_memoize;
     "constant" >::: test_constant;
-    "empty" >::: test_empty;
     "map" >::: test_map;
     "range" >::: test_range;
     "filter" >::: test_filter;

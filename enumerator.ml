@@ -69,11 +69,13 @@ let make l =
 let of_list = make
 
 let empty =
-  let nth i = raise Out_of_bounds in
-  {size = Beint.zero;
-   nth;
-   shape = "empty";
-   depth = 0}
+  let nth _ = raise Out_of_bounds in
+  {
+    size = Beint.zero;
+    nth;
+    shape = "empty";
+    depth = 0
+  }
 
 let constant e =
   let nth i =
