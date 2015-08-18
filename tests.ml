@@ -6,6 +6,9 @@ let pp_int = string_of_int
 let pp_list pp_elem l =
   "[" ^ String.concat "; " (List.map pp_elem l) ^ "]"
 
+let pp_pair pp_e1 pp_e2 (e1, e2) =
+  "(" ^ pp_e1 e1 ^ ", " ^ pp_e2 e2 ^ ")"
+
 let (===) a b =
   fun _ -> assert_equal a b
 
@@ -132,22 +135,19 @@ let test_interleave =
   ]
 
 let test_product =
-  let (===) a b = fun _ ->
-    assert_equal a b
-  in
-  [
-    "empty" >::
-    ([] === elements (product empty empty));
-    "empty" >::
-    ([] === elements (product empty (constant 1)));
-    "empty" >::
-    ([] === elements (product (constant 1) empty));
-    "singleton" >::
-    ([1, 1] === elements (product (constant 1) (constant 1)));
-    "lexicographic" >::
-    ([0, 2; 1, 2; 0, 3; 1, 3] === elements (product (range 0 1) (range 2 3)));
-  ]
+  let test output (input_1, input_2) =
+    let printer = pp_list (pp_pair pp_int pp_int) in
+    let combined = product input_1 input_2 in
+    assert_equal ~printer output (elements combined) in
 
+  map_test test [
+    ("empty_empty", [], (empty, empty));
+    ("empty_one_two", [], (empty, one_two));
+    ("one_two_empty", [], (one_two, empty));
+    ("distribute_left", [(1, 3); (2, 3)], (one_two, make [3]));
+    ("distribute_right", [(3, 1); (3, 2)], (make [3], one_two));
+    ("distribute_both", [(1, 3); (2, 3); (1, 4); (2, 4)], (one_two, make [3; 4]));
+  ]
 
 let test_bitset =
   let (===) a b = fun _ ->
@@ -290,9 +290,9 @@ let suite = "enumerator" >::: [
     "constant_delayed" >::: test_constant_delayed;
     "range" >::: test_range;
     "filter" >::: test_filter;
-    "product" >::: test_product;
     "append" >::: test_append;
     "interleave" >::: test_interleave;
+    "product" >::: test_product;
     "bitset" >::: test_bitset;
     "subset" >::: test_subset;
     "squash" >::: test_squash;

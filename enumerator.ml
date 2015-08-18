@@ -172,6 +172,26 @@ let sub s start len =
       depth = 1 + s.depth
     }
 
+let map_product e1 e2 f =
+  let e1_size = e1.size in
+  let size = Beint.mul e1_size e2.size in
+  let e1_nth = e1.nth in
+  let e2_nth = e2.nth in
+  let nth i =
+    f (e1_nth (Beint.rem i e1_size)) (e2_nth (Beint.div i e1_size)) in
+  {
+    size;
+    nth;
+    shape = "prod";
+    depth = 1 + max_i e1.depth e2.depth
+  }
+
+let product a b =
+  if is_empty a || is_empty b then
+    empty (* optimization *)
+  else
+    map_product a b (fun a b -> (a, b))
+
 (* Interleaving two enumerators of the same size. *)
 let interleave' e1 e2 =
   assert (Beint.equal e1.size e2.size);
@@ -262,25 +282,13 @@ let squash e =
     shape = "squash";
   }
 
-let cartesian_product (e : 'a t) (f : 'b t) (k : 'a -> 'b -> 'c) : 'c t =
-  let e_size = e.size in
-  let size = Beint.mul e_size f.size in
-  let e_nth = e.nth in
-  let f_nth = f.nth in
-  let nth i = k (e_nth (Beint.rem i e_size)) (f_nth (Beint.div i e_size)) in
-  {
-    size;
-    nth;
-    shape = "prod";
-    depth = 1 + max_i e.depth f.depth}
-
 (** [list e] takes as input a list of enumerators and enumerate the
     the cartesian product of these enumerators. Hence, each element
     in the resulting enumerator has the same length. *)
 let rec list (e : 'a t list) : 'a list t =
   match e with
   | [] -> constant []
-  | t::q -> cartesian_product t (list q) (fun t q -> t :: q)
+  | t::q -> map_product t (list q) (fun t q -> t :: q)
 
 let partition (f : 'a -> bool) (e : 'a t) : 'a t * 'a t =
   let e_size = e.size in
@@ -305,13 +313,6 @@ let partition (f : 'a -> bool) (e : 'a t) : 'a t * 'a t =
     let ok = of_array (Array.of_list ok) in
     let ko = of_array (Array.of_list ko) in
     ok, ko
-
-(** {2 Constructors} *)
-
-let product a b =
-  if Beint.equal Beint.zero a.size || Beint.equal Beint.zero b.size
-  then empty
-  else cartesian_product a b (fun a b -> a, b)
 
 let scalar_left : 'a -> 'b t -> ('a * 'b) t = fun k t ->
   {

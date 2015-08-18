@@ -78,6 +78,9 @@ val append : 'a t -> 'a t -> 'a t
     append the remaining one after that. *)
 val interleave : 'a t -> 'a t -> 'a t
 
+(** Enumerate pairs. *)
+val product : 'a t -> 'b t -> ('a * 'b) t
+
 (** Concatenate an enumerator of enumerators.  *)
 val squash : 'a t t -> 'a t
 
@@ -87,9 +90,6 @@ val round_robin : 'a t t -> 'a t
 (** [firstn n e] enumerates the first [n] elements from the enumerator [e].  If the
     enumerator has less than [n] elements, it will only enumerate those. *)
 val firstn : int64 -> 'a t -> 'a list * 'a t
-
-(** Enumerate pairs. *)
-val product : 'a t -> 'b t -> ('a * 'b) t
 
 (** [scalar_left a e] enumerates [(a, e0), (a, e1), ...] where [e0, e1, ...] are the
     elements of the enumerator [e]. *)
