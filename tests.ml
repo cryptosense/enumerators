@@ -85,6 +85,10 @@ let test_constant = [
   "one" >:: ([1] === elements (constant 1));
 ]
 
+let test_constant_delayed = [
+  "one" >:: ([1] === elements (constant_delayed (fun () -> 1)));
+]
+
 let test_range = [
   "empty" >::
   ([] === elements (range 10 0));
@@ -284,6 +288,7 @@ let suite = "enumerator" >::: [
     "iter" >::: test_iter;
     "memoize" >::: test_memoize;
     "constant" >::: test_constant;
+    "constant_delayed" >::: test_constant_delayed;
     "range" >::: test_range;
     "filter" >::: test_filter;
     "product" >::: test_product;
