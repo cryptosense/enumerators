@@ -290,29 +290,29 @@ let rec list (e : 'a t list) : 'a list t =
   | [] -> constant []
   | t::q -> map_product t (list q) (fun t q -> t :: q)
 
-let partition (f : 'a -> bool) (e : 'a t) : 'a t * 'a t =
+let partition f e =
   let e_size = e.size in
   let e_nth = e.nth in
+
   let rec indices ok ko i =
-    if Beint.equal i e_size
-    then List.rev ok, List.rev ko
+    if Beint.equal i e_size then
+      List.rev ok, List.rev ko
     else
       let elt = e_nth i in
-      if f elt
-      then indices (elt :: ok) ko (Beint.succ i)
-      else indices ok (elt :: ko) (Beint.succ i)
-  in
-  (* Printf.eprintf "partition\n%!"; *)
-  let ok, ko = indices [] [] Beint.zero in
-  (* Printf.eprintf "partition done\n%!"; *)
-  if ok = []
-  then empty, e
-  else if ko = []
-  then e, empty
+      if f elt then
+        indices (elt :: ok) ko (Beint.succ i)
+      else
+        indices ok (elt :: ko) (Beint.succ i) in
+
+  let (ok, ko) = indices [] [] Beint.zero in
+  if ok = [] then
+    empty, e
+  else if ko = [] then
+    (e, empty)
   else
     let ok = of_array (Array.of_list ok) in
     let ko = of_array (Array.of_list ko) in
-    ok, ko
+    (ok, ko)
 
 let scalar_left : 'a -> 'b t -> ('a * 'b) t = fun k t ->
   {

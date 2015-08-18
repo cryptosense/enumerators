@@ -108,6 +108,23 @@ let test_filter = [
   ([0; 2] === elements (filter (fun x -> x mod 2 = 0) (range 0 2)));
 ]
 
+let test_partition =
+  let is_pair n =
+    (n mod 2) == 0 in
+
+  let test output input =
+    let (p1, p2) = partition is_pair input in
+    let printer = pp_pair (pp_list pp_int) (pp_list pp_int) in
+    assert_equal ~printer output (elements p1, elements p2) in
+
+  map_test test [
+    ("empty", ([], []), empty);
+    ("balanced", ([2], [1]), one_two);
+    ("ony_true", ([2; 4], []), make [2; 4]);
+    ("ony_false", ([], [1; 3]), make [1; 3]);
+    ("unbalanced", ([4; 6], [1; 3; 5]), make [1; 3; 4; 5; 6]);
+  ]
+
 let test_append =
   let test output (input_1, input_2) =
     let appended = append input_1 input_2 in
@@ -290,15 +307,16 @@ let suite = "enumerator" >::: [
     "constant" >::: test_constant;
     "constant_delayed" >::: test_constant_delayed;
     "range" >::: test_range;
-    "bitset" >::: test_bitset;
+    "firstn" >:: test_firstn;
     "filter" >::: test_filter;
+    "partition" >::: test_partition;
+    "bitset" >::: test_bitset;
     "append" >::: test_append;
     "interleave" >::: test_interleave;
     "product" >::: test_product;
     "subset" >::: test_subset;
     "squash" >::: test_squash;
     "round_robin" >::: test_round_robin;
-    "firstn" >:: test_firstn;
     "choose_k_from_list" >::: test_choose_k_from_list;
   ]
 
