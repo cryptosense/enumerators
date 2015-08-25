@@ -115,13 +115,22 @@ let constant_delayed e =
    shape = "constant_delayed";
    depth = 0}
 
+(** [range a b] produces an enumerator for the integers between [a] and [b] included.  If
+    [b < a], the enumerator is empty. *)
+let range a b =
+  let size = succ (b - a) in
+  let size = max_i 0 size in
+  let nth i =
+    let i = Beint.to_int i in
+    assert (i < size);
+    a + i
+  in
+  let size = Beint.of_int size in
+  { size; nth; shape = "range"; depth = 1 }
+
 let memoize e =
   Array.init (Beint.to_int e.size) (fun i -> Beint.of_int i |> e.nth)
   |> of_array
-
-(******************************************************************************)
-(*                         Operations on Enumerations                         *)
-(******************************************************************************)
 
 let filter (f : 'a -> bool) (e : 'a t) : 'a t =
   let rec indices acc i =
@@ -507,19 +516,6 @@ let choose_k_from_list ~k l =
     let g = Array.of_list l in
     let n = Array.length g in
     map (Subset.enum_of_bitmask g) (from_n_choose_k ~k ~n)
-
-(** [range a b] produces an enumerator for the integers between [a]
-    and [b] included. If [b < a] the range is empty. *)
-let range (a : int) (b : int) =
-  let size = succ (b - a) in
-  let size = max_i 0 size in
-  let nth i =
-    let i = Beint.to_int i in
-    assert (i < size);
-    a + i
-  in
-  let size = Beint.of_int size in
-  {size; nth; shape = "range"; depth = 1}
 
 let elements s =
   let r = ref [] in
