@@ -365,17 +365,6 @@ let from_n_choose_k ~n ~k =
   make (generate [] element)
 ;;
 
-let print_binary ?(length=Sys.word_size) n =
-  let n = ref n in
-  Bytes.init length
-    (fun _ ->
-       let c = if !n mod 2 = 0 then '0' else '1' in
-       n := !n / 2;
-       c
-    )
-  |> Bytes.to_string
-;;
-
 (** [binomial n k] computes the binomial coefficient, that is the number of
     ways to pick [k] elements among [n]. *)
 let rec binomial n k =
@@ -523,44 +512,6 @@ let range (a : int) (b : int) =
   in
   let size = Beint.of_int size in
   {size; nth; shape = "range"; depth = 1}
-
-(******************************************************************************)
-(*                                    array                                   *)
-(******************************************************************************)
-
-(** [array ve] takes as input an array of enumerators and returns an
-    enumerator of the cartesian product. This function is much more
-    efficient than its [list] equivalent. *)
-let array (t : 'a t array) : 'a array t =
-  let n = Array.length t in
-  let state = Array.make n Beint.zero in
-  let nth index =
-    let rec aux (i : int) (value : Beint.t) =
-      if i = n
-      then Array.mapi
-          (fun (i : int) (j : Beint.t) ->
-             let ti = Array.get t i in
-             ti.nth j)
-          state
-      else
-        begin
-          let ti = Array.get t i in
-          let ti_size = ti.size in
-          assert (Beint.lt Beint.zero ti_size);
-          Array.set state i (Beint.rem value ti_size);
-          aux (succ i) (Beint.div value ti_size)
-        end
-    in
-    aux 0 index
-  in
-  let size = Array.fold_left (fun acc enum -> Beint.mul acc enum.size) Beint.one t in
-  let depth = Array.fold_left (fun acc enum -> max_i acc enum.depth) 0 t in
-  {
-    size;
-    depth;
-    shape = "array";
-    nth;
-  }
 
 type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
 
