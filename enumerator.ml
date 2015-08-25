@@ -538,8 +538,6 @@ let firstn len s =
     elements (sub s Beint.zero len),
     sub s len (Beint.sub s.size len)
 
-let depth s = s.depth
-
 let shuffle_array arr =
   for n = Array.length arr - 1 downto 1 do
     let k = Random.int (n + 1) in
@@ -574,3 +572,5 @@ let maybe_some_of ~k (list : 'a list) (e : 'a list t) : 'a list t =
     let options = subset ~k (List.map constant list) |> squash in
     map (fun options -> map (fun base -> options @ base) e) options
     |> round_robin
+
+let depth s = s.depth

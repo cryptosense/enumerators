@@ -308,6 +308,15 @@ let test_choose_k_from_list = [
   end
 ]
 
+let test_depth =
+  let test output input =
+    assert_equal ~printer:pp_int output (depth input) in
+
+  map_test test [
+    ("empty", 0, empty);
+    ("map", 1, map succ one_two);
+  ]
+
 let suite = "enumerator" >::: [
     "elements_make" >::: test_elements_make;
     "nth" >::: test_nth;
@@ -332,6 +341,7 @@ let suite = "enumerator" >::: [
     "squash" >::: test_squash;
     "round_robin" >::: test_round_robin;
     "choose_k_from_list" >::: test_choose_k_from_list;
+    "depth" >::: test_depth;
   ]
 
 let () = run_test_tt_main suite
