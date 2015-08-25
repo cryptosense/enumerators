@@ -78,6 +78,14 @@ let make l =
 
 let of_list = make
 
+type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
+
+(* The following version is the most efficient way to build an enumerator out of a set.
+   I experimented with two versions that use Set.fold, but they were much less
+   efficient. *)
+let of_set (type t) (type elt) ((module Set) : (t, elt) set) (t : t) =
+  make (Set.elements t)
+
 let empty =
   let nth _ = raise Out_of_bounds in
   {
@@ -512,14 +520,6 @@ let range (a : int) (b : int) =
   in
   let size = Beint.of_int size in
   {size; nth; shape = "range"; depth = 1}
-
-type ('t, 'elt) set = (module Set.S with type t = 't and type elt = 'elt)
-
-(* The following version is the most efficient way to build an enum out of a set. I
-   experimented with two versions that use Set.fold, but they are much less efficient.  *)
-let of_set (type t) (type elt) ((module Set) : (t, elt) set) (t : t) =
-  let elements = Set.elements t in
-  make elements
 
 let elements s =
   let r = ref [] in

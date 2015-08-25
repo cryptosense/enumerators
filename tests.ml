@@ -84,6 +84,19 @@ let test_memoize =
     ("one_two", [1; 2], one_two)
   ]
 
+module IntSet = Set.Make(struct type t = int let compare = compare end)
+
+let test_of_set =
+  let test output input =
+    let set = IntSet.of_list input in
+    let enum = of_set (module IntSet) set in
+    assert_equal ~printer:(pp_list pp_int) output (elements enum) in
+
+  map_test test [
+    ("empty", [], []);
+    ("one_two", [1; 2], [1; 2]);
+  ]
+
 let test_constant = [
   "one" >:: ([1] === elements (constant 1));
 ]
@@ -304,6 +317,7 @@ let suite = "enumerator" >::: [
     "map" >::: test_map;
     "iter" >::: test_iter;
     "memoize" >::: test_memoize;
+    "of_set" >::: test_of_set;
     "constant" >::: test_constant;
     "constant_delayed" >::: test_constant_delayed;
     "range" >::: test_range;
