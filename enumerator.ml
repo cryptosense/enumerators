@@ -412,7 +412,7 @@ let bitset ?k n : int t =
   of_array v
 
 (******************************************************************************)
-(*                                 round robin                                *)
+(*                                 Round robin                                *)
 (******************************************************************************)
 
 module Round_robin = struct
@@ -426,11 +426,9 @@ module Round_robin = struct
       chunks. The first chunk is a round-robin enumeration of
       enumerators that have the same size. The second chunk is a
       round-robin enumeration of enumerators that have the same size,
-      and are the remainders of what was not done in the first chunk.
+      and are the remainders of what was not done in the first chunk. *)
 
-  *)
-
-  (* check that all elements of [e] have size [size] *)
+  (* Check that all elements of [e] have size [size]. *)
   let equal_size size (e : 'a t t) : bool =
     fold_left (fun acc x -> acc && Beint.equal x.size size) true e
 
@@ -444,7 +442,7 @@ module Round_robin = struct
     {
       size = Beint.mul e.size size;
       depth = 1 + fold_left (fun acc x -> max_i acc x.depth) 0 e;
-      shape = "rr";
+      shape = "round_robin";
       nth
     }
 

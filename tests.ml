@@ -288,44 +288,30 @@ let test_subset =
 let test_squash =
   let test output input =
     let squashed = squash input in
-    assert_equal ~printer:(pp_list pp_int) output (elements squashed)
-  in
+    assert_equal ~printer:(pp_list pp_int) output (elements squashed) in
 
   map_test test [
     ("empty", [], make []);
+    ("one_two", [1; 2], make [one_two]);
     ("empty_one_two", [1; 2], make [empty; one_two]);
     ("one_two_empty", [1; 2], make [one_two; empty]);
     ("two_enumerators", [1; 2; 3; 4], make [one_two; make [3; 4]]);
     ("three_enumerators", [1; 2; 3; 4], make [one_two; make [3]; make [4]]);
   ]
 
-let test_round_robin = [
-  begin
-    "empty" >::
-    ([] === elements (round_robin (constant empty)))
-  end;
+let test_round_robin =
+  let test output input =
+    let robin = round_robin input in
+    assert_equal ~printer:(pp_list pp_int) output (elements robin) in
 
-  begin
-    "singleton" >::
-    ([1] === elements (round_robin (constant (constant 1))))
-  end;
-
-  begin
-    "range" >::
-    ([1; 2] === elements (round_robin (constant (range 1 2))))
-  end;
-
-  begin
-    let c = constant in
-    let (--) = range in
-    let (@@) = append in
-    let enum =
-      (c (1--2))@@(c (3--4)@@(c (c 5)))
-    in
-    "range" >::
-    ([1; 3; 5; 2; 4] === elements (round_robin enum))
-  end;
-]
+  map_test test [
+    ("empty", [], make []);
+    ("one_two", [1; 2], make [one_two]);
+    ("empty_one_two", [1; 2], make [empty; one_two]);
+    ("one_two_empty", [1; 2], make [one_two; empty]);
+    ("two_enumerators", [1; 3; 2; 4], make [one_two; make [3; 4]]);
+    ("three_enumerators", [1; 3; 4; 2], make [one_two; make [3]; make [4]]);
+  ]
 
 let test_firstn _ =
   for a = 0 to 4 do
