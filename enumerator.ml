@@ -363,8 +363,9 @@ module Bitset = struct
 
 end
 
+(* To avoid a division by zero, k must be greater than one. *)
 let from_n_choose_k ~n ~k =
-  let element = 1 lsl k - 1 in                 (* k ones *)
+  let element = 1 lsl k - 1 in  (* k ones *)
   let size = 1 lsl n in
   let rec generate acc set =
     if set < size
@@ -504,6 +505,9 @@ end
 let subset ?k l = Subset.of_list ?k l
 
 let choose_k_from_list ~k l =
+  if k <= 0 then
+    invalid_arg "choose_k_from_list: k must be greater than zero";
+
   match l with
   | [] -> empty
   | _ :: _ ->

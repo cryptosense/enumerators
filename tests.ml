@@ -327,23 +327,49 @@ let test_firstn _ =
     done
   done
 
-let test_choose_k_from_list = [
-  begin
-    "empty" >:: (elements (make []) === elements (choose_k_from_list ~k:1 []))
-  end;
-  begin
-    let enums = [make []; make []] in
-    "list_of_empty" >:: ([] === elements (squash (choose_k_from_list ~k:1 enums)))
-  end;
-  begin
-    let enums = [make [1; 2; 3]; make [4; 5]] in
-    let combinations = elements (squash (choose_k_from_list ~k:2 enums)) in
-    "two_lists" >:: fun _ ->
-      assert_equal ~printer:(pp_list (pp_list pp_int))
-        [[1; 4]; [2; 4]; [3; 4]; [1; 5]; [2; 5]; [3; 5]]
-        combinations
-  end
-]
+let test_choose_k_from_list =
+  let test output (enum, k) =
+    let chosen_enum_list = elements (choose_k_from_list ~k enum) in
+    let chosen_list_list = List.map elements chosen_enum_list in
+    let printer = pp_list (pp_list (pp_list pp_int)) in
+    assert_equal ~printer output chosen_list_list in
+
+  map_test test [
+    ("singleton_empty_k_one", [
+        [];
+      ], ([empty], 1));
+    ("singleton_one_two_k_one", [
+        [[1]; [2]];
+      ], ([one_two], 1));
+    ("pair_one_two_three_four_k_one", [
+        [[1]; [2]];  (* singletons from [1; 2] *)
+        [[3]; [4]];  (* singletons from [3; 4] *)
+      ], ([one_two; make [3; 4]], 1));
+    ("triple_k_one", [
+        [[1]; [2]];
+        [[3]; [4]];
+        [[5]];
+      ], ([one_two; make [3; 4]; make [5]], 1));
+    ("singleton_empty_k_two", [
+        [];
+      ], ([empty], 2));
+    ("singleton_one_two_k_two", [
+        [[1]; [2]];
+      ], ([one_two], 2));
+    ("pair_one_two_three_four_k_two", [
+        [[1; 3]; [2; 3]; [1; 4]; [2; 4]];
+      ], ([one_two; make [3; 4]], 2));
+    ("triple_k_two", [
+        [[1; 3]; [2; 3]; [1; 4]; [2; 4]];  (* pairs from [1; 2] and [3; 4] *)
+        [[1; 5]; [2; 5]];                  (* pairs from [1; 2] and [5] *)
+        [[3; 5]; [4; 5]];                  (* pairs from [3; 4] and [5] *)
+      ], ([one_two; make [3; 4]; make [5]], 2));
+  ] @ [
+    "k_zero" >:: fun _ ->
+      assert_raises
+        (Invalid_argument "choose_k_from_list: k must be greater than zero")
+        (fun () -> choose_k_from_list ~k:0 [empty]);
+  ]
 
 let test_depth =
   let test output input =

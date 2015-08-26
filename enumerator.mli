@@ -140,7 +140,12 @@ val round_robin : 'a t t -> 'a t
     result to get an enumerator of lists. *)
 val subset : ?k:int -> 'a t list -> 'a list t t
 
-(** Generate all sets of k elements by picking at most one element per input list. *)
+(** Generate all sets of [k] elements by picking at most one element per input list.
+
+    Sets are grouped (as enumerators) by the subset of enumerators from which the
+    selection is made.  See [subset] for more information on how grouping is done.
+
+    The argument [k] must be greater than zero. *)
 val choose_k_from_list : k:int -> 'a t list -> 'a list t t
 
 (** [maybe f e] builds the enumerator of [x; f x] for [x] in [e].  *)
