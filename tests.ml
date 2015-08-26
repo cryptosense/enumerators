@@ -197,41 +197,92 @@ let test_bitset =
   ]
 
 let test_subset =
-  let (===) a (b: 'a list Enumerator.t Enumerator.t) = fun _ ->
-    let b : 'a list list =
-      List.fold_right
-        (fun e acc -> Enumerator.elements e @ acc)
-        (elements b)
-        []
-    in
-    assert_equal a b in
-  [
-    "empty" >::
-    ([[]] === (subset [empty]));
+  let test output (enum, k) =
+    let subset_enum_list = elements (subset ?k enum) in
+    let subset_list_list = List.map elements subset_enum_list in
+    let printer = pp_list (pp_list (pp_list pp_int)) in
+    assert_equal ~printer output subset_list_list in
 
-    "singleton" >::
-    ([[]; [1]; [2]; [3]] === (subset [range 1 3]));
-
-    "pair" >::
-    (
-      [
+  map_test test [
+    ("empty", [], ([], None));
+    ("singleton_empty", [
+        [[]];  (* empty subset *)
+        [];    (* 1-tuples from [] *)
+      ], ([empty], None));
+    ("singleton_one_two", [
+        [[]];       (* empty subset *)
+        [[1]; [2]]  (* 1-tuples from [1; 2] *)
+      ], ([one_two], None));
+    ("pair_empty_one_two", [
+        [[]];        (* empty subset *)
+        [];          (* 1-tuples from [] *)
+        [[1]; [2]];  (* 1-tuples from [1; 2] *)
+        [];          (* 2-tuples from [] and [1; 2] *)
+      ], ([empty; one_two], None));
+    ("pair_one_two_empty", [
+        [[]];
         [];
-        [ 1 ]; [ 2 ]; [ 3 ]; [ 4 ]; [ 5 ];
-        [ 1; 4 ]; [ 2; 4 ]; [ 3; 4 ]; [ 1; 5 ]; [ 2; 5 ]; [ 3; 5 ]
-      ]
-      ===
-      (subset [range 1 3; range 4 5]));
-    "triple" >::
-    (
-      [
+        [[1]; [2]];
         [];
-        [1]; [2]; [3]; [4]; [5]; [6];
-        [1; 4]; [2; 4]; [3; 4]; [1; 5]; [2; 5]; [3; 5]; [1; 6]; [2; 6]; [3; 6]; [4; 6]; [5; 6];
-        [1; 4; 6]; [2; 4; 6]; [3; 4; 6]; [1; 5; 6]; [2; 5; 6]; [3; 5; 6]
-      ]
-      ===
-      (subset [range 1 3; range 4 5; range 6 6]));
-
+      ], ([empty; one_two], None));
+    ("pair_one_two_three_four", [
+        [[]];
+        [[1]; [2]];
+        [[3]; [4]];
+        [[1; 3]; [2; 3]; [1; 4]; [2; 4]]
+      ], ([one_two; make [3; 4]], None));
+    ("triple", [
+        [[]];                                          (* empty subset *)
+        [[1]; [2]];                                    (* 1-tuples from [1; 2] *)
+        [[3]; [4]];                                    (* 1-tuples from [3; 4] *)
+        [[5]];                                         (* 1-tuples from [5] *)
+        [[1; 3]; [2; 3]; [1; 4]; [2; 4]];              (* 2-tuples from [1; 2] and [3; 4] *)
+        [[1; 5]; [2; 5]];                              (* 2-tuples from [1; 2] and [5] *)
+        [[3; 5]; [4; 5]];                              (* 2-tuples from [3; 4] and [5] *)
+        [[1; 3; 5]; [2; 3; 5]; [1; 4; 5]; [2; 4; 5]];  (* 3-tuples from [1; 2], [3; 4] and [5] *)
+      ], ([one_two; make [3; 4]; make [5]], None));
+    ("singleton_empty_k_zero", [
+        [[]];
+      ], ([empty], Some 0));
+    ("singleton_one_two_k_zero", [
+        [[]];
+      ], ([one_two], Some 0));
+    ("pair_empty_one_two_k_zero", [
+        [[]];
+      ], ([empty; one_two], Some 0));
+    ("pair_one_two_three_four_k_zero", [
+        [[]];
+      ], ([one_two; make [3; 4]], Some 0));
+    ("empty_k_one", [
+        [[]];
+        [];
+      ], ([empty], Some 1));
+    ("empty_k_one", [
+        [[]];
+        [[1]; [2]];
+      ], ([one_two], Some 1));
+    ("pair_empty_one_two_k_one", [
+        [[]];
+        [];
+        [[1]; [2]];
+      ], ([empty; one_two], Some 1));
+    ("pair_one_two_three_four_k_one", [
+        [[]];
+        [[1]; [2]];
+        [[3]; [4]];
+      ], ([one_two; make [3; 4]], Some 1));
+    ("pair_one_two_three_four_k_two", [
+        [[]];
+        [[1]; [2]];
+        [[3]; [4]];
+        [[1; 3]; [2; 3]; [1; 4]; [2; 4]]
+      ], ([one_two; make [3; 4]], Some 2));
+    ("pair_one_two_three_four_k_three", [
+        [[]];
+        [[1]; [2]];
+        [[3]; [4]];
+        [[1; 3]; [2; 3]; [1; 4]; [2; 4]]
+      ], ([one_two; make [3; 4]], Some 3));
   ]
 
 let test_squash =

@@ -119,25 +119,25 @@ val squash : 'a t t -> 'a t
 (** Squash enumerators in round-robin order.  *)
 val round_robin : 'a t t -> 'a t
 
-(** Make a balanced subset enumerator.
+(** Enumerate balanced subsets.
 
-    The resulting enumerator has type ['a list t t] (that is, is an
-    enumerator of enumerators of lists of 'a). Each ['a list t]
-    correspond to a group of subsets. The first group of subset
-    contains the subset in which the lists that contain one item; the
-    second group of subset contains the lists that contain two items;
-    and so on.
+    This enumerates groups (as enumerators) of tuples (as lists).  Each list contains at
+    most one element from each of the input enumerators.
 
-    In particular, notice that this does not yield an enumerator of
-    the lists in lexicographic order.
+    For instance, to enumerate subsets for [\[1; 2\] and [\[3; 4\]], [subset] enumerates
+    four groups.  The first group enumerates the empty list, the second group enumerates
+    the singletons from [\[1; 2\]], the third group enumerates singletons from [\[3; 4\]]
+    and the fourth group enumerates the pairs with the first element from [\[1; 2\]] and
+    the second element from [\[3; 4\]].
 
-    The user must then use either [squash] or [round_robin] to
-    collapse the two levels of [t] into one.
+    If the argument [k] is supplied, lists longer than [k] will be ignored.
 
-    The order of the list of enumerators given in arguments is
-    preserved in the result. That is, given [a] and [b] two
-    enumerators, the elements of [a] will always appear before the
-    elemetns of [b]  in the result of [subset [a; b]] *)
+    The order in the resulting lists is the same as in the input enumerator list. For
+    example, an element of [a] will never appear after an element of [b] in the lists of
+    [subset a b].
+
+    If you do not need the grouping, you can apply [squash] or [round_robin] to the
+    result to get an enumerator of lists. *)
 val subset : ?k:int -> 'a t list -> 'a list t t
 
 (** Generate all sets of k elements by picking at most one element per input list. *)

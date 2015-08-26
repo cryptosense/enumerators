@@ -268,9 +268,6 @@ let prune (e : 'a t t) : 'a t t =
       of_array v
     end
 
-(* Given an enumeration of enumerators, enumerate all values of the
-   first enumerator in the enumeration, then all values of the
-   second enumerator, and so on. *)
 let squash e =
   let e = prune e in
   let size, depth =
