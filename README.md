@@ -1,3 +1,5 @@
+[![Build status](https://api.travis-ci.org/cryptosense/enumerators.svg)](https://travis-ci.org/cryptosense/enumerators)
+
 Finite lazy enumerators
 =======================
 
