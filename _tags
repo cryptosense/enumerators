@@ -1,1 +1,2 @@
+true: safe_string
 <tests.*>: package(oUnit)
