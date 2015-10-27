@@ -1,8 +1,8 @@
-## unreleased
+## [unreleased]
 
 - Compile with `-safe-string` (issue #1)
 
-## [v0.1.0]
+## v0.1.0
 
 *2015-08-28*
 
