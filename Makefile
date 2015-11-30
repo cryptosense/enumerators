@@ -1,12 +1,18 @@
 PACKAGE=enumerators
 SOURCES=32/beint.ml 32/beint.mli 64/beint.ml 64/beint.mli enumerator.ml enumerator.mli enumerators.mllib
 TESTS=tests.ml
-TARGET_NAMES=enumerator.cmi $(PACKAGE).cma $(PACKAGE).cmxa $(PACKAGE).a
+TARGET_NAMES=enumerator.cmi $(PACKAGE).cma
+NATIVE_TARGET_NAMES=$(PACKAGE).cmxa $(PACKAGE).a
 TARGETS=$(addprefix _build/, $(TARGET_NAMES))
+NATIVE_TARGETS=$(addprefix _build/, $(NATIVE_TARGET_NAMES))
 
-.PHONY: all check check_coverage check_coverage_html install uninstall clean
+.PHONY: all byte opt check check_coverage check_coverage_html install uninstall clean
 
-all: $(TARGETS)
+all: byte opt
+
+byte: $(TARGETS)
+
+opt: $(NATIVE_TARGETS)
 
 _build/%: $(SOURCES)
 	ocamlbuild -use-ocamlfind $*
@@ -25,7 +31,7 @@ check_coverage_html:
 	rm -f bisect*.out
 
 install: uninstall
-	ocamlfind install $(PACKAGE) $(TARGETS) META
+	ocamlfind install $(PACKAGE) META $(TARGETS) -optional $(NATIVE_TARGETS)
 
 uninstall:
 	ocamlfind remove $(PACKAGE)
