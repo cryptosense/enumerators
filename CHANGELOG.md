@@ -1,6 +1,7 @@
 ## [unreleased]
 
 - Compile with `-safe-string` (issue #1)
+- Add a bytecode-only target (PR #2)
 
 ## v0.1.0
 
