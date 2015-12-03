@@ -1,4 +1,4 @@
-version = "0.1.1"
+version = "0.1.1+dev"
 description = "Finite lazy enumerators"
 archive(byte) = "enumerators.cma"
 archive(native) = "enumerators.cmxa"

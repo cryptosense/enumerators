@@ -1,3 +1,5 @@
+## [unreleased]
+
 ## [v0.1.1]
 
 *2015-12-03*
@@ -11,4 +13,5 @@
 
 - Initial release
 
+[unreleased]: https://github.com/cryptosense/enumerators/compare/v0.1.1...master
 [v0.1.1]: https://github.com/cryptosense/enumerators/compare/v0.1.0...v0.1.1
