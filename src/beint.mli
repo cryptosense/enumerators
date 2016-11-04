@@ -1,6 +1,4 @@
-(** Big enough integers (version for 32-bit platforms) *)
-
-(** A Beint integer is at least 63-bit and it avoids boxing on 64-bit platforms. *)
+(** Big enough integers  *)
 
 include module type of Int64
 

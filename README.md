@@ -54,4 +54,4 @@ You should get the following output:
 Licensing
 ---------
 
-This library is available under the 2-clause BSD license. See `COPYING` for more information.
+This library is available under the 2-clause BSD license. See `LICENSE.md` for more information.

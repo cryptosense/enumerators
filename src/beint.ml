@@ -1,5 +1,3 @@
-let () = assert (Sys.word_size = 32)
-
 include Int64
 
 let two = 2L
