@@ -6,18 +6,18 @@ bug-reports: "https://github.com/cryptosense/enumerators/issues"
 license: "BSD-2"
 dev-repo: "https://github.com/cryptosense/enumerators.git"
 build: [
-    [make] {ocaml-native}
-    [make "byte"] {!ocaml-native}
+  ["ocaml" "pkg/pkg.ml" "build" "--pinned" "%{pinned}%"]
 ]
-install: [make "install"]
-build-test: [make "check"]
-remove: ["ocamlfind" "remove" "enumerators"]
+build-test: [
+  ["ocaml" "pkg/pkg.ml" "build" "--pinned" "%{pinned}%" "--tests" "true"]
+  ["ocaml" "pkg/pkg.ml" "test"]
+]
 depends: [
   "ocamlbuild" {build}
   "ocamlfind" {build}
+  "topkg" {build}
   "ounit" {test}
 ]
-depopts: [
-  "bisect_ppx" {test}
-]
+depopts: []
+tags: ["org:cryptosense"]
 available: [ocaml-version >= "4.02.0"]
