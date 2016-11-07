@@ -1,3 +1,5 @@
+## v0.2.0
+
 - Build with topkg instead of make (issue #5)
 - Enable the "bin_annot" flag
 - Remove the 64-bit version of Beint.  The "Int64" version is used for all architectures.
