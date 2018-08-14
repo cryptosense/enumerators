@@ -6,13 +6,7 @@ external lt : int64 -> int64 -> bool = "%lessthan"
 
 external le : int64 -> int64 -> bool = "%lessequal"
 
-external gt : int64 -> int64 -> bool = "%greaterthan"
-
-external ge : int64 -> int64 -> bool = "%greaterequal"
-
 external equal : int64 -> int64 -> bool = "%equal"
-
-external not_equal : int64 -> int64 -> bool = "%notequal"
 
 let of_int64 i = i
 
