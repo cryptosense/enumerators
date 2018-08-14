@@ -58,12 +58,6 @@ let max_i (x : int) y = if x < y then y else x
 
 let min_i (x : int) y = if x < y then x else y
 
-(** [is_int i] tests whether [i] can be safely represented as a value of type [int] *)
-let is_int =
-  let n = Beint.of_int max_int in
-  let m = Beint.of_int min_int in
-  fun (i : Beint.t) -> Beint.le i n && Beint.le m i
-
 let of_array (v : 'a array) : 'a t =
   let size = Beint.of_int (Array.length v) in
   let nth i =
