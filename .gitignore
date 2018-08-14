@@ -1,4 +1,6 @@
 _build
 coverage
-tests.bisect
-tests.native
+*.bisect
+*.merlin
+*.native
+*.install

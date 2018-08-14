@@ -1,7 +1,0 @@
-description = "Finite lazy enumerators"
-version = "%%VERSION_NUM%%"
-requires = ""
-archive(byte) = "enumerators.cma"
-archive(native) = "enumerators.cmxa"
-plugin(byte) = "enumerators.cma"
-plugin(native) = "enumerators.cmxs"
