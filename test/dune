@@ -1,0 +1,7 @@
+(test
+  (name test_suite)
+  (libraries
+    enumerators
+    oUnit
+  )
+)
