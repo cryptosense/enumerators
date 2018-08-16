@@ -1,3 +1,7 @@
+## Unreleased
+
+- Build with Dune instead of topkg (issue #6)
+
 ## v0.2.0
 
 - Build with topkg instead of make (issue #5)
