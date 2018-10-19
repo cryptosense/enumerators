@@ -17,3 +17,7 @@ depends: [
   "ounit" {with-test}
 ]
 tags: ["org:cryptosense"]
+synopsis: "Finite lazy enumerators"
+description: """
+The enumerators library enables you to work with large sequences of elements.
+"""
